@@ -2,36 +2,43 @@
 using System.IO;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Formats.Png;
+using ImageMagick;
 
 
 namespace imgtopdfvv.functions
 {
     internal class PdfToImage
     {
-        private string _pdfPathInputPath = "/pdftoimg/ip_pdf";
-        private string _pdfPathOutputPath = "/pdftoimg/op_pdf";
+        public string _pdfPathInputPath { get; set; }
+        private string _pdfPathOutputPath { get; set; }
 
         public void convertPdfToImage(string inputFileName, string imageFormat)
         {
-            _pdfPathInputPath += inputFileName;
-            using (PdfDocument doc = PdfReader.Open(_pdfPathInputPath, PdfDocumentOpenMode.ReadOnly))
-            {
-                for (int i = 0; i < doc.PageCount; ++i)
-                {
-                    var page = doc.Pages[i];
+            _pdfPathInputPath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\pdftoimg\\ip_pdf\\" + inputFileName + ".pdf";
 
-                    using (var image = new Image<Rgba32>(((int)page.Width.Point), ((int)page.Height.Point)))
-                    {
-                        if (imageFormat == "png")
-                            image.SaveAsPng(Path.Combine(_pdfPathOutputPath, $"{inputFileName}_{DateTime.Now.ToShortTimeString()}_page-{i + 1}.png"));
-                        else
-                            image.SaveAsJpeg(Path.Combine(_pdfPathOutputPath, $"{inputFileName}_{DateTime.Now.ToShortTimeString()}_page-{i + 1}.jpeg"));
-                    }
-                }
-            }
+            if (!Directory.Exists(_pdfPathOutputPath))
+                Console.WriteLine("Output directory does not exist");
+
+
+            // ----------------------------------------------------------------------
+            // 
+            //using (var images = new MagickImageCollection())
+            //{
+            //    images.Read(_pdfPathInputPath);
+
+            //    for (int i = 0; i < images.Count; i++)
+            //    {
+            //        _pdfPathOutputPath = Path.Combine(
+            //            Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\pdftoimg\\op_img"
+            //            , $"{inputFileName}_{DateTime.Now.ToString("yyyyMMdd_HHmmss")}_page-{i + 1}.{imageFormat}");
+            //        var image = images[i];
+
+            //        image.Format = imageFormat == "png" ? MagickFormat.Png : MagickFormat.Jpeg;
+
+            //        image.Write(_pdfPathOutputPath);
+            //    }
+            //}
+            // ----------------------------------------------------------------------
         }
     }
 }
